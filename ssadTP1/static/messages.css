@@ -1,0 +1,99 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    height: 100vh;
+    background: linear-gradient(135deg, #230536, #1e032c);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 90%;
+    height: 90vh;
+    background: #fff;
+    border-radius: 10px;
+    display: flex;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* === Sidebar === */
+.sidebar {
+    width: 220px;
+    background: linear-gradient(to bottom, #831eff, #701cc3);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+}
+
+.sidebar .logo {
+    margin-bottom: 30px;
+    font-family: serif;
+    letter-spacing: 1px;
+    cursor: default;
+}
+
+.sidebar button {
+    width: 90%;
+    margin: 10px 0;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background: white;
+    color: #591cc3;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.sidebar button:hover {
+    background: #671cc3;
+    color: white;
+}
+
+/* === Main Content === */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.main-content h2 {
+    color: #591cc3;
+    margin-bottom: 10px;
+}
+
+.message-form input,
+.message-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.message-form button {
+    background: linear-gradient(to right, #1e90ff, #1c77c3);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.message-form button:hover {
+    background: #671cc3;
+}
+
+.message-card {
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 5px;
+    margin: 8px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

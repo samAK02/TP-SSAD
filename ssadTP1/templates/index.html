@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Signup</title>
+    <link rel="icon"  href="{{url_for('static',filename='2.png')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+
+</head>
+
+<body>
+
+    <div class="form-container">
+        <div class="form-header">
+            <div id="login-tab" class="active" onclick="showLogin()">Login</div>
+            <div id="signup-tab" onclick="showSignup()">Signup</div>
+        </div>
+
+
+        <div id="login-form" class="form-content">
+            <form method="POST" action="/login">
+                <input type="text" name="username" placeholder="username" required>
+                <div class="password-container">
+                    <input type="password" name="password" id="login-password" placeholder="Password" required>
+                    <i class="toggle-password" onclick="togglePassword('login-password')">👁️</i>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <div class="form-footer">
+                <p>Not a member? <a href="#" onclick="showSignup()">Signup now</a></p>
+            </div>
+        </div>
+
+
+        <div id="signup-form" class="form-content" style="display: none;">
+            <form method="POST" action="/signup">
+
+
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                
+                <div class="password-container">
+                    <input type="password" name="password" id="signup-password" placeholder="Password" required>
+                    <i class="toggle-password" onclick="togglePassword('signup-password')">👁️</i>
+                </div>
+
+                <button type="submit">Signup</button>
+            </form>
+
+
+            <div class="form-footer">
+                <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginTab = document.getElementById('login-tab');
+        const signupTab = document.getElementById('signup-tab');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+
+        function showLogin() {
+            loginTab.classList.add('active');
+            signupTab.classList.remove('active');
+            loginForm.style.display = 'block';
+            signupForm.style.display = 'none';
+        }
+
+        function showSignup() {
+            signupTab.classList.add('active');
+            loginTab.classList.remove('active');
+            signupForm.style.display = 'block';
+            loginForm.style.display = 'none';
+        }
+
+        function togglePassword(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const icon = passwordField.nextElementSibling;
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                icon.textContent = "🙈";
+            } else {
+                passwordField.type = "password";
+                icon.textContent = "👁️";
+            }
+        }
+    </script>
+
+<script>
+document.querySelector('form[action="/login"]').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    const response = await fetch('/login', {
+        method: 'POST',
+        body: formData
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+        // ✅ Sauvegarde du token JWT renvoyé par Flask
+        
+        localStorage.setItem('token', result.token);
+
+        // ✅ Redirection vers ta page HTML messages.html (pas la route Flask directe)
+        window.location.href = '/messages';
+    } else {
+        alert(result.msg || 'Login failed');
+    }
+});
+</script>
+
+
+</body>
+
+</html>

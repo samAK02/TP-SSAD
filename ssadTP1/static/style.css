@@ -1,0 +1,119 @@
+ body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #230536, #1e032c);
+        }
+
+        #heading {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s ease;
+            text-align: center;
+            font-family: serif;
+        }
+
+        #heading:hover {
+            color: #095ebe;
+            transform: scale(1.1);
+        }
+
+        .form-container {
+            background: #fff;
+            width: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-evenly;
+            background: linear-gradient(to right, #831eff, #701cc3);
+        }
+
+        .form-header div {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s ease;
+        }
+
+        .form-header .active {
+            background: white;
+            color: #591cc3;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .form-content {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .form-content input {
+            width: calc(100% - 40px);
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .password-container {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .password-container input {
+            width: 90%;
+        }
+
+        .password-container i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #777;
+        }
+
+        .form-content button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #1e90ff, #1c77c3);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .form-content button:hover {
+            background: #671cc3;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .form-footer a {
+            color: #591cc3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Messages</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <div style="display:flex;align-items:center;justify-content:center;"><h1>SSAD</h1></div>
+      <button id="writeBtn">✉️ Write</button>
+      <button id="sentBtn">📤 Sent</button>
+      <button id="receivedBtn">📥 Received</button>
+      <button id="logoutBtn">🚪 Logout</button>
+      <div style="display:flex;align-items:center;justify-content:center;margin-top: 100px;"><em id="usernmee"></em></div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+      <h2>Welcome to your mailbox!</h2>
+      <p>Select a section from the sidebar to view your messages.</p>
+    </div>
+  </div>
+
+<script>
+// === Session check ===
+async function checkSession() {
+  try {
+    const res = await fetch('/api/check_token', { method: 'GET', credentials: 'include' });
+    if (!res.ok) { alert('Session expirée'); window.location.href = '/'; }
+    const data = await res.json();
+    const usernmee = document.getElementById('usernmee');
+   usernmee.textContent = '@' + data.logged_in_as; // ✅ Affiche le username récupéré du token
+  } catch (err) { alert('Erreur serveur'); window.location.href = '/'; }
+}
+checkSession();
+
+// === Caesar on printable ASCII 32..126 ===
+function cesarChiffrement(texte, cle) {
+  let resultat = "";
+  const debut = 32, fin = 126, plage = fin - debut + 1;
+  const k = ((cle % plage) + plage) % plage;
+  for (let i = 0; i < texte.length; i++) {
+    const code = texte.charCodeAt(i);
+    if (code >= debut && code <= fin) {
+      const codeChiffre = ((code - debut + k) % plage + plage) % plage + debut;
+      resultat += String.fromCharCode(codeChiffre);
+    } else resultat += texte[i];
+  }
+  return resultat;
+}
+function cesarDechiffrement(texte, cle) {
+  return cesarChiffrement(texte, -cle);
+}
+
+// === UI & logic ===
+const mainContent = document.getElementById('mainContent');
+
+// === COMPOSE MESSAGE ===
+document.getElementById('writeBtn').addEventListener('click', () => {
+  mainContent.innerHTML = `
+    <h2>✉️ Compose a Message</h2>
+    <form id="sendMessageForm" class="message-form">
+      <input type="text" id="to" placeholder="To (username):" required>
+      <input type="text" id="subject" placeholder="Subject:">
+      <textarea id="content" placeholder="Your message..." rows="6" required></textarea>
+
+      <h3>Encryption method :</h3>
+      <div id="encryptionOptions">
+        <label> César:<input type="checkbox" name="encryption" value="cesar"></label><br>
+      </div>
+
+      <div id="cesarKeyField" style="display:none; margin-top:10px;">
+        <input type="number" id="cesarKey" placeholder="Clé de chiffrement (ex: 3)">
+      </div>
+
+      <button type="submit">Send</button>
+    </form>
+  `;
+
+  const cesarChk = document.querySelector('input[value="cesar"]');
+  const cesarKeyField = document.getElementById('cesarKeyField');
+  cesarChk.addEventListener('change', () => {
+    cesarKeyField.style.display = cesarChk.checked ? 'block' : 'none';
+  });
+
+  document.getElementById('sendMessageForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const to = document.getElementById('to').value.trim();
+  const subject = document.getElementById('subject').value.trim();
+  let content = document.getElementById('content').value.trim();
+  const cesarChecked = document.querySelector('input[value="cesar"]').checked;
+  const cesarKey = parseInt(document.getElementById('cesarKey').value || 0);
+
+  if (!to || !content) { 
+    alert('Recipient and content required'); 
+    return; 
+  }
+
+  // Étape 1 : récupérer receiver_id depuis le serveur
+  const resUser = await fetch(`/api/user_id/${to}`, { credentials: 'include' });
+  const dataUser = await resUser.json();
+  if (!resUser.ok) {
+    alert('❌ Destinataire introuvable.');
+    return;
+  }
+  const receiverId = dataUser.id;
+
+  // Étape 2 : générer timestamp et clé de session
+  const now = new Date();
+  const timeMs = now.getTime(); // millisecondes
+  const sessionKey = (receiverId * timeMs) % 95;
+
+  let meta = null;
+
+  if (cesarChecked) {
+    // Étape 3 : chiffrer message + meta
+    content = cesarChiffrement(content, cesarKey);
+    const uuid = "CAESAR-UUID-001";
+    const meta_plain = `${cesarKey}|${uuid}`;
+    meta = cesarChiffrement(meta_plain, sessionKey);
+  }
+
+  // Étape 4 : envoi du message
+  const res = await fetch('/api/send_message', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ to, subject, content, meta, timestamp: timeMs })
+  });
+
+  const data = await res.json();
+  if (res.ok) {
+    alert(cesarChecked ? '✅ Message envoyé avec chiffrement César !' : '✅ Message envoyé (non chiffré).');
+  } else {
+    alert(data.error || 'Erreur envoi');
+  }
+});
+
+});
+// === SENT MESSAGES ===
+document.getElementById('sentBtn').addEventListener('click', async () => {
+  try {
+    const res = await fetch('/api/messages/sent', { credentials: 'include' });
+    const data = await res.json();
+    if (!res.ok) { alert(data.msg || 'Session expirée'); window.location.href = '/'; return; }
+    let html = '<h2>📤 Sent Messages</h2>';
+    if (data.messages && data.messages.length) {
+      data.messages.forEach(msg => { html += `<div class="message-card">To: ${msg.receiver} — ${msg.content}</div>`; });
+    } else html += '<p>No sent messages found.</p>';
+    mainContent.innerHTML = html;
+  } catch (err) {
+    alert('Erreur serveur');
+  }
+});
+
+// === RECEIVED MESSAGES ===
+document.getElementById('receivedBtn').addEventListener('click', async () => {
+  try {
+    const res = await fetch('/api/messages', { credentials: 'include' });
+    const data = await res.json();
+    if (!res.ok) { alert(data.msg || 'Session expirée'); window.location.href = '/'; return; }
+
+    let html = '<h2>📥 Received Messages</h2>';
+    if (data.messages && data.messages.length) {
+      data.messages.forEach(msg => {
+        const date = new Date(Number(msg.timestamp));
+        const readable = date.toLocaleString();
+        html += `
+          <div class="message-card" data-id="${msg.id}">
+            <p><b>From:</b> ${msg.sender}</p>
+            <p><b>Subject:</b> ${msg.subject || ''}</p>
+            <p><b>Message:</b> <span class="msg-content">${msg.content}</span></p>
+            
+            ${msg.meta ? `<div style="display: flex; flex-direction : row; gap: 370px;margin-left:450px;"> <button class="decipherBtn" style="border-radius:10px; " >🔓 Decipher</button> <p> ${readable}</p> </div>` : ""}
+          </div>`;
+      });
+    } else html += '<p>No messages found.</p>';
+
+    mainContent.innerHTML = html;
+
+    // Déchiffrement côté client
+    document.querySelectorAll('.decipherBtn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const card = e.target.closest('.message-card');
+        const messageId = card.dataset.id;
+        const contentSpan = card.querySelector('.msg-content');
+
+        const detailRes = await fetch(`/api/messages/${messageId}`, { credentials: 'include' });
+        const msgData = await detailRes.json();
+        if (!detailRes.ok) { alert(msgData.msg || 'Erreur'); return; }
+
+        const meta = msgData.meta;
+        const contentEncrypted = msgData.content;
+        const receiverId = msgData.receiver_id;
+        const timeMs = msgData.timestamp;
+
+        if (!meta) { alert('Ce message n\'est pas chiffré'); return; }
+
+        const sessionKey = (receiverId * timeMs) % 95;
+        const decryptedMeta = cesarDechiffrement(meta, sessionKey);
+        const [cesarKeyStr, uuid] = decryptedMeta.split('|');
+        const cesarKey = parseInt(cesarKeyStr);
+
+        if (uuid === 'CAESAR-UUID-001' && !Number.isNaN(cesarKey)) {
+          const decryptedMsg = cesarDechiffrement(contentEncrypted, cesarKey);
+          contentSpan.textContent = decryptedMsg;
+          alert('✅ Message déchiffré avec succès !');
+        } else {
+          alert('❌ Meta corrompue ou chiffrement inconnu.');
+        }
+      });
+    });
+  } catch (err) {
+    alert('Erreur serveur');
+  }
+});
+
+// === LOGOUT ===
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch('/logout', { method: 'POST', credentials: 'include' });
+  window.location.href = '/';
+});
+
+</script>
+</body>
+</html>
