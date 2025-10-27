@@ -1,99 +1,104 @@
 body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    height: 100vh;
-    background: linear-gradient(135deg, #230536, #1e032c);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: #f6f8fc;
+  color: #333;
+  height: 100vh;
+  overflow: hidden;
 }
 
+/* Structure principale */
 .container {
-    width: 90%;
-    height: 90vh;
-    background: #fff;
-    border-radius: 10px;
-    display: flex;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
+  display: flex;
+  height: 100vh;
 }
 
-/* === Sidebar === */
+/* ===== Sidebar ===== */
 .sidebar {
-    width: 220px;
-    background: linear-gradient(to bottom, #831eff, #701cc3);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 10px;
+  width: 240px;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  overflow: hidden;
 }
 
-.sidebar .logo {
-    margin-bottom: 30px;
-    font-family: serif;
-    letter-spacing: 1px;
-    cursor: default;
+.sidebar.collapsed {
+  width: 70px;
 }
 
-.sidebar button {
-    width: 90%;
-    margin: 10px 0;
-    padding: 12px;
-    border: none;
-    border-radius: 5px;
-    background: white;
-    color: #591cc3;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s ease;
+.top-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
 }
 
-.sidebar button:hover {
-    background: #671cc3;
-    color: white;
+.menu-icon {
+  cursor: pointer;
+  color: #5f6368;
+  margin-right: 10px;
 }
 
-/* === Main Content === */
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #5f6368;
+  transition: opacity 0.3s;
+}
+
+.sidebar.collapsed .logo {
+  opacity: 0;
+}
+
+/* ===== Boutons ===== */
+.nav-buttons {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.nav-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: none;
+  background: none;
+  color: #202124;
+  font-weight: 500;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.nav-buttons button:hover {
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.sidebar.collapsed .label {
+  display: none;
+}
+
+/* ===== User Info ===== */
+.user-info {
+  margin-top: auto;
+  padding: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: #5f6368;
+}
+
+/* ===== Main content ===== */
 .main-content {
-    flex: 1;
-    padding: 30px;
-    overflow-y: auto;
-}
-
-.main-content h2 {
-    color: #591cc3;
-    margin-bottom: 10px;
-}
-
-.message-form input,
-.message-form textarea {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.message-form button {
-    background: linear-gradient(to right, #1e90ff, #1c77c3);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.message-form button:hover {
-    background: #671cc3;
-}
-
-.message-card {
-    background: #f9f9f9;
-    padding: 12px;
-    border-radius: 5px;
-    margin: 8px 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  flex: 1;
+  background: #fff;
+  border-radius: 10px;
+  margin: 15px;
+  padding: 25px;
+  overflow-y: auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
