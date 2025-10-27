@@ -8,8 +8,10 @@
     <link rel="icon"  href="{{url_for('static',filename='2.png')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
 </head>
+
 
 <body>
 
@@ -25,7 +27,7 @@
                 <input type="text" name="username" placeholder="username" required>
                 <div class="password-container">
                     <input type="password" name="password" id="login-password" placeholder="Password" required>
-                    <i class="toggle-password" onclick="togglePassword('login-password')">👁️</i>
+                    <i class="toggle-password" onclick="togglePassword('login-password')"><span class="material-symbols-outlined">visibility</span></i>
                 </div>
                 <button type="submit">Login</button>
             </form>
@@ -44,7 +46,7 @@
                 
                 <div class="password-container">
                     <input type="password" name="password" id="signup-password" placeholder="Password" required>
-                    <i class="toggle-password" onclick="togglePassword('signup-password')">👁️</i>
+                    <i class="toggle-password" onclick="togglePassword('signup-password')"><span class="material-symbols-outlined">visibility</span></i>
                 </div>
 
                 <button type="submit">Signup</button>
@@ -82,10 +84,10 @@
             const icon = passwordField.nextElementSibling;
             if (passwordField.type === "password") {
                 passwordField.type = "text";
-                icon.textContent = "🙈";
+                icon.innerHTML  = `<span class="material-symbols-outlined">visibility_off</span>`;
             } else {
                 passwordField.type = "password";
-                icon.textContent = "👁️";
+                icon.innerHTML = `<span class="material-symbols-outlined">visibility</span>`;
             }
         }
     </script>
