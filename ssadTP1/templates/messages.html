@@ -3,17 +3,249 @@
 <head>
   <meta charset="UTF-8">
   <title>Messages</title>
+  <link rel="icon" href="{{ url_for('static', filename='2.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+  <style>
+    /* --- Icônes Material --- */
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+      font-size: 20px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    /* --- Boutons généraux --- */
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 4px 0;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* ============================== */
+    /*         SIDEBAR STYLE          */
+    /* ============================== */
+
+    .sidebar {
+      width: 190px;
+      background: #fff;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.25s ease;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .top-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .menu-icon { cursor: pointer; }
+
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .sidebar.collapsed .logo { display: none; }
+
+    .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 6px;
+    }
+
+    .nav-buttons button {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      padding: 8px 12px;
+      border: none;
+      background: none;
+      color: #202124;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .nav-buttons button:hover {
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+
+    .sidebar.collapsed .label { display: none; }
+
+    .user-info {
+      margin-top: auto;
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #5f6368;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed #usernmee { display: none; }
+
+    .main-content { flex: 1; padding: 20px; }
+    .container { display: flex; height: 100vh; }
+
+
+     
+    #sendMessageForm{
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+     
+    #sendMessageForm textarea{
+      border: 2px solid black;
+      border-radius: 20px;
+      width: 50%;
+      height: 200px;
+    }
+    #sendMessageForm #to{
+       border: 2px solid black;
+      border-radius: 20px;
+      width: 50%;
+      height: 30px;
+    }
+    #sendMessageForm button{
+      width: 100px;
+    }
+
+    /* === MODAL === */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .modal-box {
+      background: #fff;
+      padding: 25px 30px;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 360px;
+      animation: scaleIn 0.3s ease;
+    }
+
+    .modal-box select, .modal-box input {
+      width: 80%;
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+    }
+
+    .modal-actions button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .modal-actions button.cancel {
+      background: #ccc;
+    }
+
+    .modal-actions button#confirmEncryptionBtn {
+      background: #007bff;
+      color: #fff;
+    }
+
+
+
+
+    .time-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+  font-size: 13px;
+  color: #555;
+}
+.time-info .material-symbols-outlined {
+  font-size: 16px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
 </head>
+
 <body>
   <div class="container">
-    <div class="sidebar">
-      <div style="display:flex;align-items:center;justify-content:center;"><h1>SSAD</h1></div>
-      <button id="writeBtn">✉️ Write</button>
-      <button id="sentBtn">📤 Sent</button>
-      <button id="receivedBtn">📥 Received</button>
-      <button id="logoutBtn">🚪 Logout</button>
-      <div style="display:flex;align-items:center;justify-content:center;margin-top: 100px;"><em id="usernmee"></em></div>
+    <div class="sidebar collapsed" id="sidebar">
+      <div class="top-section">
+        <span id="toggleSidebar" class="material-symbols-outlined menu-icon">menu</span>
+        <h1 class="logo">SSAD</h1>
+      </div>
+
+      <nav class="nav-buttons">
+        <button id="writeBtn"><span class="material-symbols-outlined">edit_square</span><span class="label">Write</span></button>
+        <button id="sentBtn"><span class="material-symbols-outlined">send</span><span class="label">Sent</span></button>
+        <button id="receivedBtn"><span class="material-symbols-outlined">move_to_inbox</span><span class="label">Received</span></button>
+        <button id="logoutBtn"><span class="material-symbols-outlined">logout</span><span class="label">Logout</span></button>
+      </nav>
+
+      <div class="user-info" style="display: flex;flex-direction: row;">
+        <span class="material-symbols-outlined">account_circle</span>
+        <h3 id="usernmee" style="  margin: 0 !important;
+  padding: 0 !important;"></h3>
+      </div>
     </div>
 
     <div class="main-content" id="mainContent">
@@ -22,206 +254,353 @@
     </div>
   </div>
 
-<script>
-// === Session check ===
-async function checkSession() {
-  try {
-    const res = await fetch('/api/check_token', { method: 'GET', credentials: 'include' });
-    if (!res.ok) { alert('Session expirée'); window.location.href = '/'; }
-    const data = await res.json();
-    const usernmee = document.getElementById('usernmee');
-   usernmee.textContent = '@' + data.logged_in_as; // ✅ Affiche le username récupéré du token
-  } catch (err) { alert('Erreur serveur'); window.location.href = '/'; }
-}
-checkSession();
-
-// === Caesar on printable ASCII 32..126 ===
-function cesarChiffrement(texte, cle) {
-  let resultat = "";
-  const debut = 32, fin = 126, plage = fin - debut + 1;
-  const k = ((cle % plage) + plage) % plage;
-  for (let i = 0; i < texte.length; i++) {
-    const code = texte.charCodeAt(i);
-    if (code >= debut && code <= fin) {
-      const codeChiffre = ((code - debut + k) % plage + plage) % plage + debut;
-      resultat += String.fromCharCode(codeChiffre);
-    } else resultat += texte[i];
-  }
-  return resultat;
-}
-function cesarDechiffrement(texte, cle) {
-  return cesarChiffrement(texte, -cle);
-}
-
-// === UI & logic ===
-const mainContent = document.getElementById('mainContent');
-
-// === COMPOSE MESSAGE ===
-document.getElementById('writeBtn').addEventListener('click', () => {
-  mainContent.innerHTML = `
-    <h2>✉️ Compose a Message</h2>
-    <form id="sendMessageForm" class="message-form">
-      <input type="text" id="to" placeholder="To (username):" required>
-      <input type="text" id="subject" placeholder="Subject:">
-      <textarea id="content" placeholder="Your message..." rows="6" required></textarea>
-
-      <h3>Encryption method :</h3>
-      <div id="encryptionOptions">
-        <label> César:<input type="checkbox" name="encryption" value="cesar"></label><br>
+  <!-- === MODAL POPUP === -->
+  <div id="encryptionModal" class="modal-overlay">
+    <div class="modal-box">
+      <h2>Choose Encryption Method</h2>
+      <select id="popupEncryptionSelect">
+        <option value="">-- Select a method --</option>
+        <option value="cesar">César</option>
+        <option value="affine">Affine</option>
+        <option value="hill">Hill</option>
+        <option value="playfair">Playfair</option>
+      </select>
+      <div id="popupCesarKey" style="display:none;">
+        <input type="number" id="popupCesarKeyInput" placeholder="Clé César (ex: 3)">
+      </div>
+      <div id="popupAffineKeys" style="display:none;">
+        <input type="number" id="popupAffineA" placeholder="a (premier avec 224)">
+        <input type="number" id="popupAffineB" placeholder="b (décalage)">
+      </div>
+      
+      <div id="popupHillKey" style="display:none;">
+        <input type="number" id="popupAffineA" placeholder="a (premier avec 224)">
+        <input type="number" id="popupAffineB" placeholder="b (décalage)">
       </div>
 
-      <div id="cesarKeyField" style="display:none; margin-top:10px;">
-        <input type="number" id="cesarKey" placeholder="Clé de chiffrement (ex: 3)">
+      <div id="popupPlayfairKeys" style="display:none;">
+        <input type="number" id="popupAffineA" placeholder="a (premier avec 224)">
+        <input type="number" id="popupAffineB" placeholder="b (décalage)">
       </div>
 
-      <button type="submit">Send</button>
-    </form>
-  `;
 
-  const cesarChk = document.querySelector('input[value="cesar"]');
-  const cesarKeyField = document.getElementById('cesarKeyField');
-  cesarChk.addEventListener('change', () => {
-    cesarKeyField.style.display = cesarChk.checked ? 'block' : 'none';
-  });
+      <div class="modal-actions">
+        <button id="confirmEncryptionBtn">Confirm</button>
+        <button class="cancel" id="cancelEncryptionBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-  document.getElementById('sendMessageForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const to = document.getElementById('to').value.trim();
-  const subject = document.getElementById('subject').value.trim();
-  let content = document.getElementById('content').value.trim();
-  const cesarChecked = document.querySelector('input[value="cesar"]').checked;
-  const cesarKey = parseInt(document.getElementById('cesarKey').value || 0);
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("toggleSidebar");
+    toggleBtn.addEventListener("click", () => sidebar.classList.toggle("collapsed"));
 
-  if (!to || !content) { 
-    alert('Recipient and content required'); 
-    return; 
-  }
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/check_token', { method: 'GET', credentials: 'include' });
+        if (!res.ok) { alert('Session expirée'); window.location.href = '/'; }
+        const data = await res.json();
+        document.getElementById('usernmee').textContent = '@' + data.logged_in_as;
+      } catch { alert('Erreur serveur'); window.location.href = '/'; }
+    }
+    checkSession();
 
-  // Étape 1 : récupérer receiver_id depuis le serveur
-  const resUser = await fetch(`/api/user_id/${to}`, { credentials: 'include' });
-  const dataUser = await resUser.json();
-  if (!resUser.ok) {
-    alert('❌ Destinataire introuvable.');
-    return;
-  }
-  const receiverId = dataUser.id;
+    // === CÉSAR & AFFINE ===
+    function cesarChiffrement(txt, k) {
+      let res = "", start = 32, end = 255, mod = end - start + 1;
+      k = ((k % mod) + mod) % mod;
+      for (let ch of txt) {
+        const code = ch.charCodeAt(0);
+        res += (code >= start && code <= end)
+          ? String.fromCharCode(((code - start + k) % mod) + start)
+          : ch;
+      }
+      return res;
+    }
+    const cesarDechiffrement = (txt, k) => cesarChiffrement(txt, -k);
+    const pgcd = (a, b) => b === 0 ? a : pgcd(b, a % b);
+    const invMod = (a, m) => { for (let x = 1; x < m; x++) if ((a * x) % m === 1) return x; return null; };
 
-  // Étape 2 : générer timestamp et clé de session
-  const now = new Date();
-  const timeMs = now.getTime(); // millisecondes
-  const sessionKey = (receiverId * timeMs) % 95;
+    function affineChiffrement(txt, a, b) {
+      const start = 32, end = 255, mod = end - start + 1;
+      if (pgcd(a, mod) !== 1) return txt;
+      let res = "";
+      for (let ch of txt) {
+        const code = ch.charCodeAt(0);
+        res += (code >= start && code <= end)
+          ? String.fromCharCode(((a * (code - start) + b) % mod) + start)
+          : ch;
+      }
+      return res;
+    }
 
-  let meta = null;
+    const affineDechiffrement = (txt, a, b) => {
+      const start = 32, end = 255, mod = end - start + 1, invA = invMod(a, mod);
+      let res = "";
+      for (let ch of txt) {
+        const code = ch.charCodeAt(0);
+        res += (code >= start && code <= end)
+          ? String.fromCharCode(((invA * ((code - start - b + mod)) % mod) + start))
+          : ch;
+      }
+      return res;
+    };
 
-  if (cesarChecked) {
-    // Étape 3 : chiffrer message + meta
-    content = cesarChiffrement(content, cesarKey);
-    const uuid = "CAESAR-UUID-001";
-    const meta_plain = `${cesarKey}|${uuid}`;
-    meta = cesarChiffrement(meta_plain, sessionKey);
-  }
+    // === WRITE SECTION ===
+    const mainContent = document.getElementById('mainContent');
+    document.getElementById('writeBtn').addEventListener('click', () => {
+      mainContent.innerHTML = `
+        <h2>Compose a Message</h2>
+        <form id="sendMessageForm">
+          <input type="text" id="to" placeholder="To (username):" required>
+          <textarea id="content" placeholder="Your message..." rows="6" required></textarea>
+          <button type="submit">Send <span class="material-symbols-outlined">rocket_launch</span></button>
+        </form>`;
+      attachSendHandler();
+    });
 
-  // Étape 4 : envoi du message
-  const res = await fetch('/api/send_message', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify({ to, subject, content, meta, timestamp: timeMs })
-  });
+    // === OPEN MODAL ===
+    function openEncryptionPopup(to, content) {
+      const modal = document.getElementById('encryptionModal');
+      modal.style.display = 'flex';
 
-  const data = await res.json();
-  if (res.ok) {
-    alert(cesarChecked ? '✅ Message envoyé avec chiffrement César !' : '✅ Message envoyé (non chiffré).');
-  } else {
-    alert(data.error || 'Erreur envoi');
-  }
-});
+      document.getElementById('popupEncryptionSelect').value = '';
+      document.getElementById('popupCesarKey').style.display = 'none';
+      document.getElementById('popupAffineKeys').style.display = 'none';
+      document.getElementById('popupHillKey').style.display = 'none';
+      document.getElementById('popupPlayfairKeys').style.display = 'none';
+      document.getElementById('popupEncryptionSelect').onchange = e => {
+        const val = e.target.value;
+        document.getElementById('popupCesarKey').style.display = val === 'cesar' ? 'block' : 'none';
+        document.getElementById('popupAffineKeys').style.display = val === 'affine' ? 'block' : 'none';
+        document.getElementById('popupHillKey').style.display = val === 'hill' ? 'block' : 'none';
+        document.getElementById('popupPlayfairKeys').style.display = val === 'playfair' ? 'block' : 'none';
+      };
 
-});
-// === SENT MESSAGES ===
-document.getElementById('sentBtn').addEventListener('click', async () => {
+      document.getElementById('cancelEncryptionBtn').onclick = () => modal.style.display = 'none';
+      document.getElementById('confirmEncryptionBtn').onclick = () => sendEncryptedMessage(to, content);
+    }
+
+
+/* ===========================
+   SECTIONS SENT & RECEIVED
+=========================== */
+
+const sentBtn = document.getElementById("sentBtn");
+const receivedBtn = document.getElementById("receivedBtn");
+const main = document.getElementById("mainContent");
+
+/* === Charger les messages envoyés === */
+sentBtn.addEventListener("click", async () => {
   try {
-    const res = await fetch('/api/messages/sent', { credentials: 'include' });
+    const res = await fetch("/api/messages/sent", { credentials: "include" });
     const data = await res.json();
-    if (!res.ok) { alert(data.msg || 'Session expirée'); window.location.href = '/'; return; }
-    let html = '<h2>📤 Sent Messages</h2>';
-    if (data.messages && data.messages.length) {
-      data.messages.forEach(msg => { html += `<div class="message-card">To: ${msg.receiver} — ${msg.content}</div>`; });
-    } else html += '<p>No sent messages found.</p>';
-    mainContent.innerHTML = html;
+    if (!res.ok) return alert(data.error || "Erreur serveur");
+
+    if (data.messages.length === 0) {
+      main.innerHTML = "<h2>Sent Messages</h2><p>Aucun message envoyé.</p>";
+      return;
+    }
+
+    main.innerHTML = "<h2>Sent Messages</h2>";
+    data.messages.forEach(msg => {
+      const div = document.createElement("div");
+      div.className = "message-box";
+      div.innerHTML = `
+        <p><strong>To:</strong> ${msg.receiver}</p>
+        <p><strong>Content (encrypted):</strong><br><code>${msg.content}</code></p>
+<p>
+  <small>
+    <div class="time-info">
+      <span class="material-symbols-outlined">schedule</span>
+      ${new Date(msg.timestamp).toLocaleString()}
+    </div>
+  </small>
+</p>
+      `;
+      main.appendChild(div);
+    });
   } catch (err) {
-    alert('Erreur serveur');
+    console.error(err);
+    alert("Erreur lors du chargement des messages envoyés");
   }
 });
 
-// === RECEIVED MESSAGES ===
-document.getElementById('receivedBtn').addEventListener('click', async () => {
+/* === Charger les messages reçus === */
+receivedBtn.addEventListener("click", async () => {
   try {
-    const res = await fetch('/api/messages', { credentials: 'include' });
+    const res = await fetch("/api/messages", { credentials: "include" });
     const data = await res.json();
-    if (!res.ok) { alert(data.msg || 'Session expirée'); window.location.href = '/'; return; }
+    if (!res.ok) return alert(data.error || "Erreur serveur");
 
-    let html = '<h2>📥 Received Messages</h2>';
-    if (data.messages && data.messages.length) {
-      data.messages.forEach(msg => {
-        const date = new Date(Number(msg.timestamp));
-        const readable = date.toLocaleString();
-        html += `
-          <div class="message-card" data-id="${msg.id}">
-            <p><b>From:</b> ${msg.sender}</p>
-            <p><b>Subject:</b> ${msg.subject || ''}</p>
-            <p><b>Message:</b> <span class="msg-content">${msg.content}</span></p>
-            
-            ${msg.meta ? `<div style="display: flex; flex-direction : row; gap: 370px;margin-left:450px;"> <button class="decipherBtn" style="border-radius:10px; " >🔓 Decipher</button> <p> ${readable}</p> </div>` : ""}
-          </div>`;
-      });
-    } else html += '<p>No messages found.</p>';
+    if (data.messages.length === 0) {
+      main.innerHTML = "<h2>Received Messages</h2><p>Aucun message reçu.</p>";
+      return;
+    }
 
-    mainContent.innerHTML = html;
+    main.innerHTML = "<h2>Received Messages</h2>";
+    data.messages.forEach(msg => {
+      const div = document.createElement("div");
+      div.className = "message-box";
 
-    // Déchiffrement côté client
-    document.querySelectorAll('.decipherBtn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const card = e.target.closest('.message-card');
-        const messageId = card.dataset.id;
-        const contentSpan = card.querySelector('.msg-content');
+      div.innerHTML = `
+        <p><strong>From:</strong> ${msg.sender}</p>
+        <p><strong>Message:</strong><br><code>${msg.content}</code></p>
+        <button class="decryptBtn"
+                data-meta="${msg.meta}"
+                data-content="${msg.content}"
+                data-receiver-id="${msg.receiver_id}"
+                data-timestamp="${msg.timestamp}">
+          <span class="material-symbols-outlined">
+lock_open
+</span> Déchiffrer
+        </button>
+        <div class="decrypted"></div>
+        
+        <p>
+  <small>
+    <div class="time-info">
+      <span class="material-symbols-outlined">schedule</span>
+      ${new Date(msg.timestamp).toLocaleString()}
+    </div>
+  </small>
+</p>
 
-        const detailRes = await fetch(`/api/messages/${messageId}`, { credentials: 'include' });
-        const msgData = await detailRes.json();
-        if (!detailRes.ok) { alert(msgData.msg || 'Erreur'); return; }
+      `;
+      main.appendChild(div);
+    });
 
-        const meta = msgData.meta;
-        const contentEncrypted = msgData.content;
-        const receiverId = msgData.receiver_id;
-        const timeMs = msgData.timestamp;
+    // Attacher les handlers de déchiffrement
+    document.querySelectorAll(".decryptBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const metaEnc = btn.dataset.meta;
+        const contentEnc = btn.dataset.content;
+        const receiverId = parseInt(btn.dataset.receiverId);
+        const timestamp = parseInt(btn.dataset.timestamp);
+        const div = btn.nextElementSibling;
 
-        if (!meta) { alert('Ce message n\'est pas chiffré'); return; }
+        try {
+          //calcul la clé de session
+          const sessionKey = (receiverId * timestamp) % 95;
+          const meta = cesarDechiffrement(metaEnc, sessionKey);
+          let type = "Inconnu"; 
 
-        const sessionKey = (receiverId * timeMs) % 95;
-        const decryptedMeta = cesarDechiffrement(meta, sessionKey);
-        const [cesarKeyStr, uuid] = decryptedMeta.split('|');
-        const cesarKey = parseInt(cesarKeyStr);
+          //Identifier la méthode de chiffrement
+          let decrypted = "Impossible de déchiffrer.";
+          if (meta.includes("CAESAR-UUID")) {
+            const key = parseInt(meta.split("|")[0]);
+            decrypted = cesarDechiffrement(contentEnc, key);
+            type = "Cesar";
+          } else if (meta.includes("AFFINE-UUID")) {
+            const [a, b] = meta.split("|")[0].split(",").map(Number);
+            decrypted = affineDechiffrement(contentEnc, a, b);
+            type = "Affine";
 
-        if (uuid === 'CAESAR-UUID-001' && !Number.isNaN(cesarKey)) {
-          const decryptedMsg = cesarDechiffrement(contentEncrypted, cesarKey);
-          contentSpan.textContent = decryptedMsg;
-          alert('✅ Message déchiffré avec succès !');
-        } else {
-          alert('❌ Meta corrompue ou chiffrement inconnu.');
+          } else if (meta.includes("HILL-UUID")) {
+            decrypted = "[Méthode Hill non implémentée]";
+            type = "Hill";
+
+          } else if (meta.includes("PLAYFAIR-UUID")) {
+            decrypted = "[Méthode Playfair non implémentée]";
+            type = "Plaufaire";
+
+          }
+
+          div.innerHTML = `<p><strong>Decrypted:</strong><br>${decrypted}</p><br><p><strong>${type}</strong></p>`;
+        } catch (err) {
+          div.innerHTML = `<p style="color:red;">Erreur: ${err.message}</p>`;
         }
       });
     });
   } catch (err) {
-    alert('Erreur serveur');
+    console.error(err);
+    alert("Erreur lors du chargement des messages reçus");
   }
 });
 
-// === LOGOUT ===
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  await fetch('/logout', { method: 'POST', credentials: 'include' });
-  window.location.href = '/';
-});
+/* ===========================
+   STYLES SIMPLES POUR LES MSG
+=========================== */
+const style = document.createElement("style");
+style.innerHTML = `
+.message-box {
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.decryptBtn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.decryptBtn:hover { background: #0056b3; }
+.decrypted { margin-top: 10px; padding: 8px; background: #f7f7f7; border-radius: 6px; }
+`;
+document.head.appendChild(style);
 
-</script>
+
+
+
+
+
+
+
+
+
+    async function sendEncryptedMessage(to, content) {
+      const modal = document.getElementById('encryptionModal');
+      const method = document.getElementById('popupEncryptionSelect').value;
+      if (!method) return alert('Please select a method');
+
+      const resUser = await fetch(`/api/user_id/${to}`, { credentials: 'include' });
+      const dataUser = await resUser.json();
+      if (!resUser.ok) return alert('Destinataire introuvable');
+      const receiverId = dataUser.id;
+      const now = new Date();
+      const t = now.getTime();
+      const sessionKey = (receiverId * t) % 95;
+      let meta = null, encrypted = content;
+
+      if (method === 'cesar') {
+        const k = parseInt(document.getElementById('popupCesarKeyInput').value || 0);
+        encrypted = cesarChiffrement(content, k);
+        meta = cesarChiffrement(`${k}|CAESAR-UUID-001`, sessionKey);
+      } else if (method === 'affine') {
+        const a = parseInt(document.getElementById('popupAffineA').value || 1);
+        const b = parseInt(document.getElementById('popupAffineB').value || 0);
+        encrypted = affineChiffrement(content, a, b);
+        meta = cesarChiffrement(`${a},${b}|AFFINE-UUID-777`, sessionKey);
+      }
+
+      const res = await fetch('/api/send_message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ to, content: encrypted, meta, timestamp: t })
+      });
+
+      const data = await res.json();
+      modal.style.display = 'none';
+      alert(res.ok ? '✅ Message envoyé avec chiffrement !' : data.error || 'Erreur envoi');
+    }
+
+    function attachSendHandler() {
+      document.getElementById('sendMessageForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const to = document.getElementById('to').value.trim();
+        const content = document.getElementById('content').value.trim();
+        if (!to || !content) return alert('Recipient and content required');
+        openEncryptionPopup(to, content);
+      });
+    }
+  </script>
 </body>
 </html>
