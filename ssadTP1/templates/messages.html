@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Messages</title>
-  <link rel="icon" href="{{ url_for('static', filename='2.png') }}">
+  <title>SSAD mails</title>
+  <link rel="icon" href="{{ url_for('static', filename='tof (1).png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
@@ -66,12 +66,13 @@
       border-bottom: 1px solid #eee;
     }
 
-    .menu-icon { cursor: pointer; }
+    .menu-icon { cursor: pointer; margin-left: 10px; }
 
     .logo {
       font-size: 18px;
       font-weight: bold;
-      margin: 0;
+      
+      height: 50px;
     }
 
     .sidebar.collapsed .logo { display: none; }
@@ -215,6 +216,65 @@
   vertical-align: middle;
 }
 
+
+/* === STÉGANOGRAPHIE === */
+.stegano-container {
+  max-width: 600px;
+  margin: auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.tab-header {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.tab-btn.active {
+  color: #007bff;
+  border-bottom: 3px solid #007bff;
+}
+
+.tab-pane {
+  display: none;
+  text-align: center;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.tab-pane input, .tab-pane textarea {
+  width: 80%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.tab-pane button {
+  margin-top: 12px;
+  padding: 8px 14px;
+}
+
+
+
+
+
     @keyframes fadeIn {
       from { opacity: 0; } to { opacity: 1; }
     }
@@ -224,20 +284,33 @@
       to { transform: scale(1); opacity: 1; }
     }
   </style>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Italianno&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
   <div class="container">
     <div class="sidebar collapsed" id="sidebar">
       <div class="top-section">
-        <span id="toggleSidebar" class="material-symbols-outlined menu-icon">menu</span>
-        <h1 class="logo">SSAD</h1>
+        <span id="toggleSidebar" class="material-symbols-outlined menu-icon">
+view_headline
+</span>
+       
+        <div class="logo" style="display: flex;flex-direction: row;align-items: center;justify-content: center;"><h2>SSAD</h2><div style="font-family: 'Italianno', cursive;font-size: 20px;">mails</div></div>
+
       </div>
 
       <nav class="nav-buttons">
         <button id="writeBtn"><span class="material-symbols-outlined">edit_square</span><span class="label">Write</span></button>
         <button id="sentBtn"><span class="material-symbols-outlined">send</span><span class="label">Sent</span></button>
         <button id="receivedBtn"><span class="material-symbols-outlined">move_to_inbox</span><span class="label">Received</span></button>
+        <button id="stegano"><span class="material-symbols-outlined">mail_shield</span><span class="label">Steganography</span></button>
+        <button id="attaque"><span class="material-symbols-outlined">skull</span><span class="label">Attaques</span></button>
+
+       
+        <button id="search"><span class="material-symbols-outlined">search</span><span class="label">Search</span></button>
+
         <button id="logoutBtn"><span class="material-symbols-outlined">logout</span><span class="label">Logout</span></button>
       </nav>
 
@@ -274,13 +347,13 @@
       </div>
       
       <div id="popupHillKey" style="display:none;">
-        <input type="number" id="popupAffineA" placeholder="a (premier avec 224)">
-        <input type="number" id="popupAffineB" placeholder="b (décalage)">
+        <input type="number" id="popupAffineAhill" placeholder="a (premier avec 224)">
+        <input type="number" id="popupAffineBhill" placeholder="b (décalage)">
       </div>
 
       <div id="popupPlayfairKeys" style="display:none;">
-        <input type="number" id="popupAffineA" placeholder="a (premier avec 224)">
-        <input type="number" id="popupAffineB" placeholder="b (décalage)">
+        <input type="number" id="popupAffineAplay" placeholder="a (premier avec 224)">
+        <input type="number" id="popupAffineBplay" placeholder="b (décalage)">
       </div>
 
 
@@ -290,6 +363,19 @@
       </div>
     </div>
   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <script>
     const sidebar = document.getElementById("sidebar");
@@ -306,7 +392,15 @@
     }
     checkSession();
 
-    // === CÉSAR & AFFINE ===
+
+
+
+
+
+
+
+
+    // === CHIFFREMENT ===
     function cesarChiffrement(txt, k) {
       let res = "", start = 32, end = 255, mod = end - start + 1;
       k = ((k % mod) + mod) % mod;
@@ -347,6 +441,13 @@
       return res;
     };
 
+
+
+
+
+
+
+    
     // === WRITE SECTION ===
     const mainContent = document.getElementById('mainContent');
     document.getElementById('writeBtn').addEventListener('click', () => {
@@ -410,14 +511,16 @@ sentBtn.addEventListener("click", async () => {
       div.innerHTML = `
         <p><strong>To:</strong> ${msg.receiver}</p>
         <p><strong>Content (encrypted):</strong><br><code>${msg.content}</code></p>
-<p>
-  <small>
-    <div class="time-info">
+<div class="time-info">
+  <p>
+     <small>
+   
       <span class="material-symbols-outlined">schedule</span>
       ${new Date(msg.timestamp).toLocaleString()}
-    </div>
+    
   </small>
 </p>
+</div>
       `;
       main.appendChild(div);
     });
@@ -454,7 +557,7 @@ receivedBtn.addEventListener("click", async () => {
                 data-timestamp="${msg.timestamp}">
           <span class="material-symbols-outlined">
 lock_open
-</span> Déchiffrer
+</span> Decypher
         </button>
         <div class="decrypted"></div>
         
@@ -471,53 +574,233 @@ lock_open
       main.appendChild(div);
     });
 
-    // Attacher les handlers de déchiffrement
-    document.querySelectorAll(".decryptBtn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const metaEnc = btn.dataset.meta;
-        const contentEnc = btn.dataset.content;
-        const receiverId = parseInt(btn.dataset.receiverId);
-        const timestamp = parseInt(btn.dataset.timestamp);
-        const div = btn.nextElementSibling;
+    // Attacher les handlers de déchiffrement (version toggle)
+document.querySelectorAll(".decryptBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const div = btn.nextElementSibling;
+    const icon = btn.querySelector(".material-symbols-outlined");
 
-        try {
-          //calcul la clé de session
-          const sessionKey = (receiverId * timestamp) % 95;
-          const meta = cesarDechiffrement(metaEnc, sessionKey);
-          let type = "Inconnu"; 
+    // Vérifie si déjà déchiffré (toggle)
+    if (btn.dataset.state === "decrypted") {
+      // Cacher le message
+      div.innerHTML = "";
+      btn.dataset.state = "encrypted";
+      icon.textContent = "lock_open"; // cadenas ouvert
+      btn.lastChild.textContent = " Decypher"; // texte original
+      return;
+    }
 
-          //Identifier la méthode de chiffrement
-          let decrypted = "Impossible de déchiffrer.";
-          if (meta.includes("CAESAR-UUID")) {
-            const key = parseInt(meta.split("|")[0]);
-            decrypted = cesarDechiffrement(contentEnc, key);
-            type = "Cesar";
-          } else if (meta.includes("AFFINE-UUID")) {
-            const [a, b] = meta.split("|")[0].split(",").map(Number);
-            decrypted = affineDechiffrement(contentEnc, a, b);
-            type = "Affine";
+    // Sinon, déchiffrer normalement
+    const metaEnc = btn.dataset.meta;
+    const contentEnc = btn.dataset.content;
+    const receiverId = parseInt(btn.dataset.receiverId);
+    const timestamp = parseInt(btn.dataset.timestamp);
 
-          } else if (meta.includes("HILL-UUID")) {
-            decrypted = "[Méthode Hill non implémentée]";
-            type = "Hill";
+    try {
+      const sessionKey = (receiverId * timestamp) % 95;
+      const meta = cesarDechiffrement(metaEnc, sessionKey);
+      let type = "Inconnu";
+      let decrypted = "Impossible de déchiffrer.";
 
-          } else if (meta.includes("PLAYFAIR-UUID")) {
-            decrypted = "[Méthode Playfair non implémentée]";
-            type = "Plaufaire";
+      if (meta.includes("CAESAR-UUID")) {
+        const key = parseInt(meta.split("|")[0]);
+        decrypted = cesarDechiffrement(contentEnc, key);
+        type = "Cesar";
+      } else if (meta.includes("AFFINE-UUID")) {
+        const [a, b] = meta.split("|")[0].split(",").map(Number);
+        decrypted = affineDechiffrement(contentEnc, a, b);
+        type = "Affine";
+      } else if (meta.includes("HILL-UUID")) {
+        decrypted = "[Méthode Hill non implémentée]";
+        type = "Hill";
+      } else if (meta.includes("PLAYFAIR-UUID")) {
+        decrypted = "[Méthode Playfair non implémentée]";
+        type = "Playfair";
+      }
 
-          }
+      div.innerHTML = `
+        <p><strong>Decrypted:</strong><br>${decrypted}</p>
+        <br>
+        <p><strong>Type of encryption:</strong><br>${type}</p>
+      `;
 
-          div.innerHTML = `<p><strong>Decrypted:</strong><br>${decrypted}</p><br><p><strong>${type}</strong></p>`;
-        } catch (err) {
-          div.innerHTML = `<p style="color:red;">Erreur: ${err.message}</p>`;
-        }
-      });
+      // Mettre à jour le bouton
+      btn.dataset.state = "decrypted";
+      icon.textContent = "lock"; // cadenas fermé
+      btn.lastChild.textContent = " Hide"; // nouveau texte
+
+    } catch (err) {
+      div.innerHTML = `<p style="color:red;">Erreur: ${err.message}</p>`;
+    }
+  });
+});
+
+
+
+// === SECTION STÉGANOGRAPHIE ===
+document.getElementById('stegano').addEventListener('click', () => {
+  mainContent.innerHTML = `
+    <div class="stegano-container">
+      <h2>Steganography Center</h2>
+
+      <!-- Onglets -->
+      <div class="tab-header">
+        <button class="tab-btn active" data-tab="text"><span class="material-symbols-outlined" style = "color:black;">
+text_compare
+</span> Text</button>
+        <button class="tab-btn" data-tab="image"><span class="material-symbols-outlined" style = "color:black;">
+wallpaper
+</span> Image</button>
+        <button class="tab-btn" data-tab="audio"><span class="material-symbols-outlined" style = "color:black;">
+audio_description
+</span> Audio</button>
+      </div>
+
+      <!-- Contenus des onglets -->
+      <div class="tab-content">
+
+        <!-- Texte -->
+        <div class="tab-pane active" id="tab-text">
+          <h3>Hide a Message in Text</h3>
+          <input type="text" id="receiverUsernameSteg" placeholder="To (username)..." style="width: 80%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+
+          <textarea id="textMessage" placeholder="Enter your text..." rows="5"></textarea>
+
+          <div class="hidden-message-box">
+            <h4>Hidden Message:</h4>
+            <div class="hidden-message-display" id="hiddenMessageDisplay"></div>
+            <button id="clearHiddenMessage" class="clear-btn"><span class="material-symbols-outlined" style = "margin: 0 !important;color:white;">
+backspace
+</span></button>
+          </div>
+
+          <button id="sendTextStegano">Send <span class="material-symbols-outlined">send</span></button>
+        </div>
+
+        <!-- Image -->
+        <div class="tab-pane" id="tab-image">
+          <h3>Hide a Message in an Image</h3>
+          <input type="text" id="receiverUsernameSteg" placeholder="To (username)..." style="width: 80%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+          <input type="file" id="imageInput" accept="image/*"><br>
+          <input type="text" id="imageHiddenText" placeholder="Enter text to hide"><br>
+          <button id="sendImageStegano">Send <span class="material-symbols-outlined">send</span></button>
+        </div>
+
+        <!-- Audio -->
+        <div class="tab-pane" id="tab-audio">
+          <h3>Hide a Message in Audio</h3>
+          <input type="text" id="receiverUsernameSteg" placeholder="To (username)..." style="width: 80%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+          <input type="file" id="audioInput" accept="audio/*"><br>
+          <input type="text" id="audioHiddenText" placeholder="Enter text to hide"><br>
+          <button id="sendAudioStegano">Send <span class="material-symbols-outlined">send</span></button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // === Gestion des onglets ===
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabPanes.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
     });
+  });
+
+// === Système de sélection de lettres (corrigé) ===
+const textArea = document.getElementById('textMessage');
+const hiddenDisplay = document.getElementById('hiddenMessageDisplay');
+
+// Conteneur pour afficher les positions (compact)
+let letterPosDisplay = document.getElementById('letterPosDisplay');
+if (!letterPosDisplay) {
+  letterPosDisplay = document.createElement('div');
+  letterPosDisplay.id = "letterPosDisplay";
+  letterPosDisplay.style.marginTop = "10px";
+  letterPosDisplay.style.fontFamily = "monospace";
+  letterPosDisplay.style.textAlign = "left";
+  hiddenDisplay.after(letterPosDisplay);
+}
+
+let hiddenMessage = "";
+let letterPositions = [];
+
+textArea.addEventListener('mouseup', () => {
+  // Récupère bornes de sélection dans le textarea
+  const start = textArea.selectionStart;
+  const end = textArea.selectionEnd;
+
+  // On n'accepte que les sélections de 1 caractère
+  if (typeof start === 'number' && typeof end === 'number' && end - start === 1) {
+    const selectedChar = textArea.value.substring(start, end); // lettre sélectionnée
+    hiddenMessage += selectedChar;
+    letterPositions.push(start); // position (0-based)
+
+    // Met à jour l'affichage
+    hiddenDisplay.textContent = hiddenMessage;
+    letterPosDisplay.innerHTML = `<strong>Lettre emplacement:</strong> ${letterPositions.join(",")}`;
+  }
+});
+
+// === Bouton Effacer ===
+document.getElementById('clearHiddenMessage').addEventListener('click', () => {
+  hiddenMessage = "";
+  letterPositions = [];
+  hiddenDisplay.textContent = "";
+  letterPosDisplay.innerHTML = "";
+});
+
+
+
+  // === Boutons Send ===
+  document.getElementById('sendTextStegano').addEventListener('click', () => {
+    const text = textArea.value.trim();
+    if (!text) return alert("Please enter a message!");
+    if (!hiddenMessage) return alert("Please select hidden letters first!");
+    alert("Hidden message: " + hiddenMessage);
+    sendSteganoText();
+  });
+
+  document.getElementById('sendImageStegano').addEventListener('click', () => {
+    const img = document.getElementById('imageInput').files[0];
+    const hidden = document.getElementById('imageHiddenText').value.trim();
+    if (!img || !hidden) return alert("Please select an image and enter text!");
+    alert("Image stegano message sent! (simulation)");
+  });
+
+  document.getElementById('sendAudioStegano').addEventListener('click', () => {
+    const audio = document.getElementById('audioInput').files[0];
+    const hidden = document.getElementById('audioHiddenText').value.trim();
+    if (!audio || !hidden) return alert("Please select an audio file and enter text!");
+    alert("Audio stegano message sent! (simulation)");
+  });
+});
+
+
+
+
+
+
+
+
+
   } catch (err) {
     console.error(err);
     alert("Erreur lors du chargement des messages reçus");
   }
 });
+
+
+
+
+
+
+
+
 
 /* ===========================
    STYLES SIMPLES POUR LES MSG
@@ -546,10 +829,72 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
+// ⚠️ SUPPRIMER ces deux lignes globales (elles réinitialisent à chaque fois)
+//// let hiddenMessage = "";
+//// let letterPositions = [];
 
+// ✅ Version corrigée de sendSteganoText()
+async function sendSteganoText() {
+  const receiver = document.querySelector('#tab-text #receiverUsernameSteg').value.trim();
+  const coverText = document.getElementById('textMessage').value.trim();
 
+  // 🔥 Correction : on récupère les variables du scope de l'interface stéganographique
+  const hiddenDisplay = document.getElementById('hiddenMessageDisplay');
+  const letterPosDisplay = document.getElementById('letterPosDisplay');
 
+  // ✅ On relit le message et les positions affichées à l’écran (au cas où le contexte global a disparu)
+  const hiddenMessage = hiddenDisplay?.textContent?.trim() || "";
+  const letterPositions = (letterPosDisplay?.textContent?.match(/\d+/g) || []).map(Number);
 
+  if (!receiver) return alert("Please enter the recipient username!");
+  if (!coverText) return alert("Please enter the visible text!");
+  if (!hiddenMessage || letterPositions.length === 0)
+    return alert("Please select hidden letters first!");
+
+  try {
+    const resUser = await fetch(`/api/user_id/${receiver}`, { credentials: 'include' });
+    const dataUser = await resUser.json();
+    if (!resUser.ok) return alert("Destinataire introuvable !");
+    const receiverId = dataUser.id;
+
+    const timestamp = Date.now();
+    const sessionKey = (receiverId * timestamp) % 95;
+
+    // Format meta : "positions|STEGANO-TEXT-UUID-999"
+    const metaClear = `${letterPositions.join(",")}|STEGANO-TEXT-UUID-999`;
+    const metaEnc = cesarChiffrement(metaClear, sessionKey);
+
+    const payload = {
+      to: receiver,
+      content: coverText,
+      hidden_text: hiddenMessage,
+      meta: metaEnc,
+      timestamp
+    };
+const res = await fetch('/api/send_message', {
+
+    
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Erreur d'envoi");
+
+    alert("Steganographic text message sent successfully!");
+
+    // Réinitialisation locale
+    document.getElementById('textMessage').value = "";
+    hiddenDisplay.textContent = "";
+    letterPosDisplay.innerHTML = "";
+
+  } catch (err) {
+    console.error(err);
+    alert("Erreur : " + err.message);
+  }
+}
 
 
 
@@ -578,6 +923,31 @@ document.head.appendChild(style);
         const b = parseInt(document.getElementById('popupAffineB').value || 0);
         encrypted = affineChiffrement(content, a, b);
         meta = cesarChiffrement(`${a},${b}|AFFINE-UUID-777`, sessionKey);
+      }else if (meta.includes("STEGANO-TEXT-UUID")) {
+  // Exemple metaClear = "0,4,9|STEGANO-TEXT-UUID-999"
+        const posPart = meta.split("|")[0];
+       const positions = posPart.split(",").map(Number);
+        let hidden = "";
+
+  // Extraire les lettres selon les positions
+        for (let pos of positions) {
+        if (pos >= 0 && pos < contentEnc.length) {
+         hidden += contentEnc[pos];
+         }
+         }
+
+       decrypted = hidden || "[Aucun message caché trouvé]";
+        type = "Stegano Text";
+       } else if (method === 'hill') {
+        const a = parseInt(document.getElementById('popupAffineA').value || 1);
+        const b = parseInt(document.getElementById('popupAffineB').value || 0);
+        encrypted = affineChiffrement(content, a, b);
+        meta = cesarChiffrement(`${a},${b}|HILL-UUID-777`, sessionKey);
+      } else if (method === 'playfair') {
+        const a = parseInt(document.getElementById('popupAffineA').value || 1);
+        const b = parseInt(document.getElementById('popupAffineB').value || 0);
+        encrypted = affineChiffrement(content, a, b);
+        meta = cesarChiffrement(`${a},${b}|PLAYFAIR-UUID-777`, sessionKey);
       }
 
       const res = await fetch('/api/send_message', {
@@ -589,7 +959,7 @@ document.head.appendChild(style);
 
       const data = await res.json();
       modal.style.display = 'none';
-      alert(res.ok ? '✅ Message envoyé avec chiffrement !' : data.error || 'Erreur envoi');
+      alert(res.ok ? 'Message envoyé avec chiffrement !' : data.error || 'Erreur envoi');
     }
 
     function attachSendHandler() {
@@ -601,6 +971,34 @@ document.head.appendChild(style);
         openEncryptionPopup(to, content);
       });
     }
+
+
+
+
+    // === LOGOUT HANDLER ===
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  if (!confirm("Voulez-vous vraiment vous déconnecter ?")) return;
+
+  try {
+    const res = await fetch("/logout", {
+      method: "POST",
+      credentials: "include", // très important pour envoyer les cookies JWT
+    });
+
+    if (res.ok) {
+      alert("Déconnexion réussie !");
+      // Redirige vers la page de connexion (ou d'accueil)
+      window.location.href = "/";
+    } else {
+      const err = await res.json();
+      alert("Erreur lors de la déconnexion : " + (err.msg || "inconnue"));
+    }
+  } catch (error) {
+    console.error("Erreur logout :", error);
+    alert("Erreur réseau ou serveur pendant la déconnexion.");
+  }
+});
+
   </script>
 </body>
 </html>
